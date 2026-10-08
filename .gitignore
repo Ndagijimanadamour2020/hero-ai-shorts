@@ -1,0 +1,26 @@
+
+out
+# Environment / secrets
+.env
+.env.local
+.env.*.local
+
+# Next.js
+.next/
+out/
+
+# Dependencies
+node_modules/
+
+# Local media/render output
+.media/
+media/
+tmp/
+temp/
+
+# Logs
+*.log
+
+# OS
+.DS_Store
+Thumbs.db

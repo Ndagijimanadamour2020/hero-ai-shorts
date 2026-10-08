@@ -1,0 +1,2 @@
+export type Scene = { id: string; start: number; duration: number; narration: string; headline: string; subheadline?: string; visualType: string; visualPrompt?: string; visualData?: Record<string, unknown>; caption?: string; imageUrl?: string };
+export type VideoPlan = { title: string; hook: string; description: string; duration: number; language: string; scenes: Scene[]; hashtags: string[]; voiceTone: string };

@@ -1,0 +1,7 @@
+import {supabaseAdmin} from './supabase/admin';import {requireUser} from './supabase/server';import type {VideoPlan} from './schemas';
+export async function createJob(topic:string, opts:{publishAt?:string|null;autoPublish?:boolean;templateId?:string|null}={}){const user=await requireUser();const {data,error}=await supabaseAdmin().from('video_jobs').insert({user_id:user.id,topic,status:'queued',progress:0,publish_at:opts.publishAt??null,auto_publish:opts.autoPublish??false,template_id:opts.templateId??null}).select().single();if(error)throw error;return data}
+export async function createBatch(topics:string[], opts={}){const user=await requireUser();const rows=topics.map(topic=>({user_id:user.id,topic,status:'queued',progress:0,...opts}));const {data,error}=await supabaseAdmin().from('video_jobs').insert(rows).select();if(error)throw error;return data}
+export async function getJobForUser(id:string){const user=await requireUser();const {data,error}=await supabaseAdmin().from('video_jobs').select('*').eq('id',id).eq('user_id',user.id).single();if(error)throw error;return data}
+export async function updateJob(id:string,patch:Record<string,unknown>){const {data,error}=await supabaseAdmin().from('video_jobs').update(patch).eq('id',id).select().single();if(error)throw error;return data}
+export async function claimNextJob(){const {data,error}=await supabaseAdmin().rpc('claim_next_video_job');if(error)throw error;return data?.[0]??null}
+export async function savePlan(id:string,plan:VideoPlan){return updateJob(id,{plan,progress:20,status:'generating_audio'})}

@@ -1,0 +1,7 @@
+import {claimNextJob,updateJob} from '@/lib/jobs';
+import {generateVideoPlan} from '@/ai/generate-script';
+import {generateAudioForPlan,generateVisualsForPlan,renderFinalVideo} from '@/lib/media';
+import {publishJobToYoutube} from '@/lib/youtube-publish';
+
+async function processJob(job:any){try{await updateJob(job.id,{status:'generating_script',progress:5});const plan=await generateVideoPlan(job.topic);await updateJob(job.id,{plan,status:'generating_audio',progress:20});const audio=await generateAudioForPlan(plan,job.id);await updateJob(job.id,{status:'generating_visuals',progress:40});const visuals=await generateVisualsForPlan(plan,job.id);await updateJob(job.id,{status:'rendering',progress:65});const result=await renderFinalVideo(job,plan,audio,visuals);await updateJob(job.id,{status:'completed',progress:100,output_path:result.path,output_url:result.url,completed_at:new Date().toISOString()});if(job.auto_publish&&(!job.publish_at||new Date(job.publish_at)<=new Date())){try{await publishJobToYoutube({...job,...result,plan,status:'completed'})}catch(e){console.error('auto-publish failed',e)}}}catch(e:any){await updateJob(job.id,{status:'failed',progress:100,error:e?.message||String(e)})}}
+async function main(){console.log('Hero AI Shorts Factory V4 worker started');for(;;){const job=await claimNextJob();if(job){console.log('processing',job.id);await processJob(job)}else await new Promise(r=>setTimeout(r,3000))}}main().catch(e=>{console.error(e);process.exit(1)});

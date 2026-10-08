@@ -1,0 +1,2 @@
+import React from "react"; import {Composition} from "remotion"; import {ShortVideo} from "./ShortVideo";
+export const Root = () => <Composition id="ShortVideo" component={ShortVideo as any} durationInFrames={1350} fps={30} width={1080} height={1920} defaultProps={{title:"AI Short",hook:"",description:"",duration:45,language:"en",scenes:[],hashtags:[],voiceTone:"energetic"}} calculateMetadata={({props}:any)=>({durationInFrames:Math.max(30,Math.ceil((props.duration||45)*30))})}/>;

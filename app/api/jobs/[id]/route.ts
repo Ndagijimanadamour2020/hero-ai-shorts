@@ -1,0 +1,1 @@
+import {NextResponse} from 'next/server';import {getJobForUser} from '@/lib/jobs';export async function GET(_:Request,{params}:{params:Promise<{id:string}>}){try{return NextResponse.json(await getJobForUser((await params).id))}catch(e:any){return NextResponse.json({error:e.message},{status:e.message==='Unauthorized'?401:404})}}
